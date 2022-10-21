@@ -7,6 +7,9 @@ import com.eb.takeanap.entidades.Cliente;
 import com.eb.takeanap.entidades.Usuario;
 import com.eb.takeanap.repositorios.ClienteRepositorio;
 import com.eb.takeanap.repositorios.UsuarioRepositorio;
+import java.util.ArrayList;
+import java.util.List;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,8 @@ public class ClienteServicio {
     @Autowired
     UsuarioRepositorio usuarioRepositorio;
 
+    /*--------------------------- CREAR CLIENTE ---------------------------*/
+    @Transactional
     public void crearCliente(String calle, String ciudad, String codPostal, String email,
             String nombre, int numero, String pais, String idUsuario) {
 
@@ -39,5 +44,35 @@ public class ClienteServicio {
 
         clienteRepositorio.save(cliente);
     }
+
+    /*--------------------------- LISTAR CLIENTE ---------------------------*/
+    public List<Cliente> buscarTodosClientes() {
+
+        List<Cliente> cliente = new ArrayList();
+
+        cliente = clienteRepositorio.findAll();
+
+        return cliente;
+
+    }
+    
+    public List<Cliente> buscarPorNombre(String nombre){
+        
+        List<Cliente> cliente = new ArrayList();
+        
+        cliente = clienteRepositorio.buscarPorNombre(nombre);
+        
+        return cliente;
+        
+    }
+    
+    public Cliente buscarPorEmail(String email){
+        
+        Cliente cliente = clienteRepositorio.buscarPorEmail(email);
+        
+        return cliente;
+        
+    }
+            
 
 }

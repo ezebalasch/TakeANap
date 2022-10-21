@@ -26,7 +26,8 @@ public interface CasaRepositorio extends JpaRepository<Casa, String> {
     @Query("SELECT c FROM Casa c WHERE c.tipo_vivienda = :tipo_vivienda")
     List<Casa> buscarPorTipoVivienda(@Param("tipo_vivienda") String tipo_vivienda);
 
-    @Query("SELECT c FROM Casa c WHERE c.precio = :precio")
-    List<Casa> buscarPorPrecio(@Param("precio") Double precio);
+    @Query("SELECT c FROM Casa c WHERE c.precio BETWEEN :precioMenor AND :precioMayor")
+    List<Casa> buscarPorPrecio(@Param("precioMenor") Double precioMenor,
+            @Param("precioMayor") Double precioMayor);
 
 }

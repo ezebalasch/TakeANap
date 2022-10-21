@@ -23,7 +23,7 @@ public interface FamiliaRepositorio extends JpaRepository<Familia, String> {
     @Query("SELECT f FROM Familia f WHERE f.casa_id = :casa_id")
     Familia buscarPorCasa(@Param("casa_id") String casa_id);
 
-    @Query("SELECT f FROM Familia f WHERE f.nombre = :nombre")
+    @Query("SELECT f FROM Familia f WHERE f.nombre LIKE :nombre%")
     List<Familia> buscarPorNombre(@Param("nombre") String nombre);
 
 }
