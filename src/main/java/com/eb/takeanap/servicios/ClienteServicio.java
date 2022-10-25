@@ -9,6 +9,7 @@ import com.eb.takeanap.repositorios.ClienteRepositorio;
 import com.eb.takeanap.repositorios.UsuarioRepositorio;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,24 +56,46 @@ public class ClienteServicio {
         return cliente;
 
     }
-    
-    public List<Cliente> buscarPorNombre(String nombre){
-        
-        List<Cliente> cliente = new ArrayList();
-        
-        cliente = clienteRepositorio.buscarPorNombre(nombre);
-        
-        return cliente;
-        
-    }
-    
-    public Cliente buscarPorEmail(String email){
-        
-        Cliente cliente = clienteRepositorio.buscarPorEmail(email);
-        
-        return cliente;
-        
-    }
-            
 
+    public List<Cliente> buscarPorNombre(String nombre) {
+
+        List<Cliente> cliente = new ArrayList();
+
+        cliente = clienteRepositorio.buscarPorNombre(nombre);
+
+        return cliente;
+
+    }
+
+    public Cliente buscarPorEmail(String email) {
+
+        Cliente cliente = clienteRepositorio.buscarPorEmail(email);
+
+        return cliente;
+
+    }
+
+    /*--------------------------- EDITAR CLIENTE ---------------------------*/
+    @Transactional
+    public void modificarCliente(String id, String calle, String ciudad, String codPostal,
+            String email, String nombre, int numero, String pais) {
+
+        Optional<Cliente> respuesta = clienteRepositorio.findById(id);
+
+        if (respuesta.isPresent()) {
+
+            Cliente cliente = respuesta.get();
+
+            cliente.setCalle(calle);
+            cliente.setCiudad(ciudad);
+            cliente.setCodPostal(codPostal);
+            cliente.setEmail(email);
+            cliente.setNombre(nombre);
+            cliente.setNumero(numero);
+            cliente.setPais(pais);
+
+            clienteRepositorio.save(cliente);
+        }
+
+    }
 }

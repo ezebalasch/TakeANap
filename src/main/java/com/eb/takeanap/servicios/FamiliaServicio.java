@@ -11,6 +11,7 @@ import com.eb.takeanap.repositorios.FamiliaRepositorio;
 import com.eb.takeanap.repositorios.UsuarioRepositorio;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,34 +59,58 @@ public class FamiliaServicio {
         List<Familia> familia = new ArrayList();
 
         familia = familiaRepositorio.findAll();
-        
+
         return familia;
 
     }
-    
-    public Familia listarFamiliaPorEmail(String email){
-        
+
+    public Familia listarFamiliaPorEmail(String email) {
+
         Familia familia = familiaRepositorio.buscarPorEmail(email);
-        
+
         return familia;
-        
+
     }
-    
-    public Familia listarFamiliaPorCasa(String id_casa){
-        
+
+    public Familia listarFamiliaPorCasa(String id_casa) {
+
         Familia familia = familiaRepositorio.buscarPorCasa(id_casa);
-        
+
         return familia;
-        
-    } 
-    
+
+    }
+
     public List<Familia> listarFamiliaPorNombre(String nombre) {
 
         List<Familia> familia = new ArrayList();
 
         familia = familiaRepositorio.buscarPorNombre(nombre);
-        
+
         return familia;
 
-    }    
+    }
+
+    /*--------------------------- EDITAR FAMILIA ---------------------------*/
+    @Transactional
+    public void modificarFamilia(String id, int edadMax, int edadMin, String email, String nombre,
+            int numHijos) {
+
+        Optional<Familia> respuesta = familiaRepositorio.findById(id);
+
+        if (respuesta.isPresent()) {
+
+            Familia familia = respuesta.get();
+
+            familia.setEdadMax(edadMax);
+            familia.setEdadMin(edadMin);
+            familia.setEmail(email);
+            familia.setNombre(nombre);
+            familia.setNumHijos(numHijos);
+
+            familiaRepositorio.save(familia);
+
+        }
+
+    }
+
 }

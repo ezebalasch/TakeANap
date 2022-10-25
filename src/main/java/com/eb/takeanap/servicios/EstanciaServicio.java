@@ -12,6 +12,7 @@ import com.eb.takeanap.repositorios.EstanciaRepositorio;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,27 @@ public class EstanciaServicio {
         Estancia estancia = estanciaRepositorio.buscarPorHuesped(huesped);
 
         return estancia;
+
+    }
+
+    /*--------------------------- EDITAR ESTANCIA ---------------------------*/
+    @Transactional
+    public void modificarEstancia(String id, Date fechaDesde, Date fechaHasta,
+            String huesped) {
+
+        Optional<Estancia> respuesta = estanciaRepositorio.findById(id);
+
+        if (respuesta.isPresent()) {
+
+            Estancia estancia = respuesta.get();
+
+            estancia.setFechaDesde(fechaDesde);
+            estancia.setFechaHasta(fechaHasta);
+            estancia.setHuesped(huesped);
+
+            estanciaRepositorio.save(estancia);
+
+        }
 
     }
 
