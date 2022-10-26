@@ -5,6 +5,7 @@ package com.eb.takeanap.servicios;
 
 import com.eb.takeanap.entidades.Casa;
 import com.eb.takeanap.entidades.Comentario;
+import com.eb.takeanap.excepciones.MiExcepcion;
 import com.eb.takeanap.repositorios.CasaRepositorio;
 import com.eb.takeanap.repositorios.ComentarioRepositorio;
 import java.util.ArrayList;
@@ -28,8 +29,10 @@ public class ComentarioServicio {
 
     /*--------------------------- CREAR COMENTARIO ---------------------------*/
     @Transactional
-    public void crearComentario(String descripcion, String idCasa) {
+    public void crearComentario(String descripcion, String idCasa) throws MiExcepcion {
 
+        validar(descripcion, idCasa);
+        
         Casa casa = casaRepositorio.findById(idCasa).get();
 
         Comentario comentario = new Comentario();
@@ -62,18 +65,42 @@ public class ComentarioServicio {
 
     /*--------------------------- EDITAR COMENTARIO ---------------------------*/
     @Transactional
-    public void modificarComentario(String id, String descripcion) {
+    public void modificarComentario(String id, String descripcion, String idCasa) throws MiExcepcion{
+
+        validar(descripcion, id);
 
         Optional<Comentario> respuesta = comentarioRepositorio.findById(id);
+        Optional<Casa> respuestaCasa = casaRepositorio.findById(idCasa);
 
+        Casa casa = new Casa();
+        
+        if (respuestaCasa.isPresent()) {
+            casa = respuestaCasa.get();
+        }
+        
         if (respuesta.isPresent()) {
 
             Comentario comentario = respuesta.get();
 
             comentario.setDescripcion(descripcion);
-
+            comentario.setCasa(casa);
+            
             comentarioRepositorio.save(comentario);
         }
 
     }
+
+    /*--------------------------- VALIDACION COMENTARIO ---------------------------*/
+    private void validar(String descripcion, String idCasa) throws MiExcepcion {
+
+        if (descripcion.isEmpty() || descripcion == null) {
+            throw new MiExcepcion("La descripción no puede estar vacía");
+        }
+
+        if (idCasa.isEmpty() || idCasa == null) {
+            throw new MiExcepcion("El id de la casa no puede estar vacío");
+        }
+        
+    }
+
 }

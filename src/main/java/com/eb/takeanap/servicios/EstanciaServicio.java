@@ -6,6 +6,7 @@ package com.eb.takeanap.servicios;
 import com.eb.takeanap.entidades.Casa;
 import com.eb.takeanap.entidades.Cliente;
 import com.eb.takeanap.entidades.Estancia;
+import com.eb.takeanap.excepciones.MiExcepcion;
 import com.eb.takeanap.repositorios.CasaRepositorio;
 import com.eb.takeanap.repositorios.ClienteRepositorio;
 import com.eb.takeanap.repositorios.EstanciaRepositorio;
@@ -34,7 +35,9 @@ public class EstanciaServicio {
     /*--------------------------- CREAR ESTANCIA ---------------------------*/
     @Transactional
     public void crearEstancia(String idCasa, String idCliente, Date fechaDesde,
-            Date fechaHasta, String huesped) {
+            Date fechaHasta, String huesped) throws MiExcepcion {
+
+        validar(idCasa, idCliente, fechaDesde, fechaHasta, huesped);
 
         Casa casa = casaRepositorio.findById(idCasa).get();
 
@@ -89,15 +92,32 @@ public class EstanciaServicio {
 
     /*--------------------------- EDITAR ESTANCIA ---------------------------*/
     @Transactional
-    public void modificarEstancia(String id, Date fechaDesde, Date fechaHasta,
-            String huesped) {
+    public void modificarEstancia(String idCasa, String idCliente, String id,
+            Date fechaDesde, Date fechaHasta, String huesped) throws MiExcepcion {
+
+        validar(idCasa, idCliente, fechaDesde, fechaHasta, huesped);
 
         Optional<Estancia> respuesta = estanciaRepositorio.findById(id);
+        Optional<Casa> respuestaCasa = casaRepositorio.findById(idCasa);
+        Optional<Cliente> respuestaCliente = clienteRepositorio.findById(idCliente);
+
+        Casa casa = new Casa();
+        Cliente cliente = new Cliente();
+
+        if (respuestaCasa.isPresent()) {
+            casa = respuestaCasa.get();
+        }
+
+        if (respuestaCliente.isPresent()) {
+            cliente = respuestaCliente.get();
+        }
 
         if (respuesta.isPresent()) {
 
             Estancia estancia = respuesta.get();
-
+            
+            estancia.setCasa(casa);
+            estancia.setCliente(cliente);
             estancia.setFechaDesde(fechaDesde);
             estancia.setFechaHasta(fechaHasta);
             estancia.setHuesped(huesped);
@@ -108,4 +128,24 @@ public class EstanciaServicio {
 
     }
 
+    /*--------------------------- VALIDACION ESTANCIA ---------------------------*/
+    private void validar(String idCasa, String idCliente, Date fechaDesde,
+            Date fechaHasta, String huesped) throws MiExcepcion {
+
+        if (idCasa.isEmpty() || idCasa == null) {
+            throw new MiExcepcion("La casa no puede estar vacía");
+        }
+
+        if (idCliente.isEmpty() || idCliente == null) {
+            throw new MiExcepcion("El cliente no puede estar vacío");
+        }
+
+        if (fechaHasta.before(fechaDesde)) {
+            throw new MiExcepcion("Fecha errónea");
+        }
+
+        if (huesped.isEmpty() || huesped == null) {
+            throw new MiExcepcion("El huésped no puede estar vacío");
+        }
+    }
 }

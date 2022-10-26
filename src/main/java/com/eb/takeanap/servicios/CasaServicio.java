@@ -4,6 +4,7 @@
 package com.eb.takeanap.servicios;
 
 import com.eb.takeanap.entidades.Casa;
+import com.eb.takeanap.excepciones.MiExcepcion;
 import com.eb.takeanap.repositorios.CasaRepositorio;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,7 +28,10 @@ public class CasaServicio {
     @Transactional
     public void crearCasa(String calle, String ciudad, String codPostal,
             Date fechaDesde, Date fechaHasta, int minDias, int maxDias,
-            int numero, String pais, Double precio, String tipoVivienda) {
+            int numero, String pais, Double precio, String tipoVivienda) throws MiExcepcion {
+
+        validar(calle, ciudad, codPostal, fechaDesde, fechaHasta, minDias, maxDias,
+                numero, pais, precio, tipoVivienda);
 
         Casa casa = new Casa();
 
@@ -100,7 +104,11 @@ public class CasaServicio {
     @Transactional
     public void modificarCasa(String id, String calle, String ciudad,
             String codPostal, Date fechaDesde, Date fechaHasta, int minDias,
-            int maxDias, int numero, String pais, Double precio, String tipoVivienda) {
+            int maxDias, int numero, String pais, Double precio, 
+            String tipoVivienda) throws MiExcepcion{
+
+        validar(calle, ciudad, codPostal, fechaDesde, fechaHasta, minDias, maxDias,
+                numero, pais, precio, tipoVivienda);
 
         Optional<Casa> respuesta = casaRepositorio.findById(id);
 
@@ -123,6 +131,52 @@ public class CasaServicio {
             casaRepositorio.save(casa);
         }
 
+    }
+
+    /*--------------------------- VALIDACIONES CASA ---------------------------*/
+    private void validar(String calle, String ciudad, String codPostal,
+            Date fechaDesde, Date fechaHasta, int minDias, int maxDias,
+            int numero, String pais, Double precio, String tipoVivienda) throws MiExcepcion {
+
+        if (calle.isEmpty() || calle == null) {
+            throw new MiExcepcion("La calle no puede estar vacía");
+        }
+
+        if (ciudad.isEmpty() || ciudad == null) {
+            throw new MiExcepcion("La ciudad no puede estar vacía");
+        }
+
+        if (pais.isEmpty() || pais == null) {
+            throw new MiExcepcion("El país no puede estar vacío");
+        }
+
+        if (codPostal.isEmpty() || codPostal == null) {
+            throw new MiExcepcion("El codigo postal no puede estar vacío");
+        }
+
+        if (minDias == 0) {
+            throw new MiExcepcion("El minimo de días debe ser mayor a 0");
+        }
+
+        if (maxDias == 0) {
+            throw new MiExcepcion("El máximo de días no puede ser menor o igual a 0");
+        }
+
+        if (maxDias < minDias) {
+            throw new MiExcepcion("El mínimo de días no puede ser mayor al máximo de días");
+        }
+
+        if (fechaHasta.before(fechaDesde)) {
+            throw new MiExcepcion("Fecha errónea");
+        }
+
+        if (precio <= 0) {
+            throw new MiExcepcion("El precio no puede ser 0");
+        }
+
+        if (tipoVivienda.isEmpty() || tipoVivienda == null) {
+            throw new MiExcepcion("El tipo de vivienda no puede estar vacío");
+        }
     }
 
 }

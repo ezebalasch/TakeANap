@@ -5,6 +5,7 @@ package com.eb.takeanap.servicios;
 
 import com.eb.takeanap.entidades.Cliente;
 import com.eb.takeanap.entidades.Usuario;
+import com.eb.takeanap.excepciones.MiExcepcion;
 import com.eb.takeanap.repositorios.ClienteRepositorio;
 import com.eb.takeanap.repositorios.UsuarioRepositorio;
 import java.util.ArrayList;
@@ -29,7 +30,9 @@ public class ClienteServicio {
     /*--------------------------- CREAR CLIENTE ---------------------------*/
     @Transactional
     public void crearCliente(String calle, String ciudad, String codPostal, String email,
-            String nombre, int numero, String pais, String idUsuario) {
+            String nombre, int numero, String pais, String idUsuario) throws MiExcepcion {
+
+        validar(calle, ciudad, codPostal, email, nombre, numero, pais, idUsuario);
 
         Usuario usuario = usuarioRepositorio.findById(idUsuario).get();
         Cliente cliente = new Cliente();
@@ -78,9 +81,18 @@ public class ClienteServicio {
     /*--------------------------- EDITAR CLIENTE ---------------------------*/
     @Transactional
     public void modificarCliente(String id, String calle, String ciudad, String codPostal,
-            String email, String nombre, int numero, String pais) {
+            String email, String nombre, int numero, String pais, String idUsuario) throws MiExcepcion {
+
+        validar(calle, ciudad, codPostal, email, nombre, numero, pais, idUsuario);
 
         Optional<Cliente> respuesta = clienteRepositorio.findById(id);
+        Optional<Usuario> respuestaUsuario = usuarioRepositorio.findById(idUsuario);
+
+        Usuario usuario = new Usuario();
+
+        if (respuestaUsuario.isPresent()) {
+            usuario = respuestaUsuario.get();
+        }
 
         if (respuesta.isPresent()) {
 
@@ -93,9 +105,48 @@ public class ClienteServicio {
             cliente.setNombre(nombre);
             cliente.setNumero(numero);
             cliente.setPais(pais);
-
+            cliente.setUsuario(usuario);
+            
             clienteRepositorio.save(cliente);
         }
 
     }
+
+    /*--------------------------- VALIDACIONES CLIENTE ---------------------------*/
+    private void validar(String calle, String ciudad, String codPostal, String email,
+            String nombre, int numero, String pais, String idUsuario) throws MiExcepcion {
+
+        if (calle.isEmpty() || calle == null) {
+            throw new MiExcepcion("La calle no puede estar vacía");
+        }
+
+        if (ciudad.isEmpty() || ciudad == null) {
+            throw new MiExcepcion("La ciudad no puede estar vacía");
+        }
+
+        if (codPostal.isEmpty() || codPostal == null) {
+            throw new MiExcepcion("El código postal no puede estar vacío");
+        }
+
+        if (email.isEmpty() || email == null) {
+            throw new MiExcepcion("La dirección email no puede estar vacía");
+        }
+
+        if (nombre.isEmpty() || nombre == null) {
+            throw new MiExcepcion("El nombre no puede estar vacío");
+        }
+
+        if (numero <= 0) {
+            throw new MiExcepcion("El número debe ser mayor a 0");
+        }
+
+        if (pais.isEmpty() || pais == null) {
+            throw new MiExcepcion("El país no puede estar vacío");
+        }
+
+        if (idUsuario.isEmpty() || idUsuario == null) {
+            throw new MiExcepcion("El usuario no puede estar vacío");
+        }
+    }
+
 }

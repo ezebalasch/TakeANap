@@ -4,6 +4,7 @@
 package com.eb.takeanap.servicios;
 
 import com.eb.takeanap.entidades.Usuario;
+import com.eb.takeanap.excepciones.MiExcepcion;
 import com.eb.takeanap.repositorios.UsuarioRepositorio;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,8 +26,10 @@ public class UsuarioServicio {
 
     /*--------------------------- CREAR USUARIO ---------------------------*/
     @Transactional
-    public void crearUsuario(String aliaz, String clave, String email) {
+    public void crearUsuario(String aliaz, String clave, String email) throws MiExcepcion {
 
+        validar(aliaz, clave, email);
+        
         Usuario usuario = new Usuario();
 
         usuario.setAliaz(aliaz);
@@ -67,8 +70,11 @@ public class UsuarioServicio {
 
     /*--------------------------- LISTAR USUARIO ---------------------------*/
     @Transactional
-    public void modificarUsuario(String id, String aliaz, String clave) {
+    public void modificarUsuario(String id, String aliaz, String clave,
+            String email) throws MiExcepcion {
 
+        validar(aliaz, clave, email);
+        
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
 
         if (respuesta.isPresent()) {
@@ -77,11 +83,29 @@ public class UsuarioServicio {
 
             usuario.setAliaz(aliaz);
             usuario.setClave(clave);
+            usuario.setEmail(email);
 
             usuarioRepositorio.save(usuario);
 
         }
 
+    }
+
+    /*--------------------------- VALIDACION USUARIO ---------------------------*/
+    private void validar(String aliaz, String clave, String email) throws MiExcepcion {
+
+        if (aliaz.isEmpty() || aliaz == null) {
+            throw new MiExcepcion("El alias no puede estar vacío");
+        }
+
+        if (clave.isEmpty() || clave == null) {
+            throw new MiExcepcion("La clave no puede estar vacía");
+        }
+        
+        if (email.isEmpty() || email == null) {
+            throw new MiExcepcion("El email no puede estar vacío");
+        }        
+        
     }
 
 }
